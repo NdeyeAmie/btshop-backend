@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<aside class="right-side">
+    <section class="content-header">
+        <h1>Commandes <small>Liste</small></h1>
+        <ol class="breadcrumb">
+            <li><a href="{% url 'dash_admin:dashboard' %}"><i class="fa fa-dashboard"></i> Home</a></li>
+            <li class="active">Commandes</li>
+        </ol>
+    </section>
+
+    <section class="content">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title"><i class="fa fa-shopping-cart"></i> Liste des commandes</h3>
+                        <div class="box-tools pull-right">
+                            <span class="badge bg-blue">{{ orders.count }} commande(s)</span>
+                            <a href="/api/orders/export/pdf/" class="btn btn-danger btn-sm">
+            <i class="fa fa-file-pdf-o"></i> PDF
+        </a>
+        <a href="/api/orders/export/excel/" class="btn btn-success btn-sm">
+            <i class="fa fa-file-excel-o"></i> Excel
+        </a>
+                        </div>
+                    </div>
+                    <div class="box-body table-responsive no-padding">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Client</th>
+                                    <th>Téléphone</th>
+                                    <th>Total</th>
+                                    <th>Statut</th>
+                                    <th>Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for order in orders %}
+                                <tr>
+                                    <td><small>{{ order.id|truncatechars:8 }}</small></td>
+                                    <td>
+                                        <strong>{{ order.user.username }}</strong>
+                                        <br><small class="text-muted">{{ order.user.email }}</small>
+                                    </td>
+                                    <td>{{ order.phone|default:"-" }}</td>
+                                    <td><strong>{{ order.total_price }} FCFA</strong></td>
+                                    <td>
+                                        {% if order.status == 'pending' %}
+                                            <span class="label label-warning">En attente</span>
+                                        {% elif order.status == 'confirmed' %}
+                                            <span class="label label-info">Confirmée</span>
+                                        {% elif order.status == 'shipped' %}
+                                            <span class="label label-primary">Expédiée</span>
+                                        {% elif order.status == 'delivered' %}
+                                            <span class="label label-success">Livrée</span>
+                                        {% elif order.status == 'cancelled' %}
+                                            <span class="label label-danger">Annulée</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ order.created_at|date:"d/m/Y H:i" }}</td>
+                                    <td>
+                                        <a href="{% url 'dash_admin:order_detail' order.id %}"
+                                           class="btn btn-info btn-xs">
+                                            <i class="fa fa-eye"></i> Détail
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="7" class="text-center" style="padding:30px;">
+                                        <i class="fa fa-info-circle"></i> Aucune commande trouvée
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</aside>
+{% endblock %}

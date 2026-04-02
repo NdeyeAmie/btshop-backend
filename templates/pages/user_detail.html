@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<aside class="right-side">
+    <section class="content-header">
+        <h1>Utilisateur <small>Détail</small></h1>
+        <ol class="breadcrumb">
+            <li><a href="{% url 'dash_admin:dashboard' %}"><i class="fa fa-dashboard"></i> Home</a></li>
+            <li><a href="{% url 'dash_admin:user_list' %}">Utilisateurs</a></li>
+            <li class="active">{{ user_detail.username }}</li>
+        </ol>
+    </section>
+
+    <section class="content">
+        <div class="row">
+
+            <!-- Infos utilisateur -->
+            <div class="col-md-4">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title"><i class="fa fa-user"></i> Profil</h3>
+                    </div>
+                    <div class="box-body text-center">
+                        <img src="{% static 'img/avatar3.png' %}"
+                             class="img-circle"
+                             style="width:80px; height:80px; margin-bottom:15px;">
+                        <h4>{{ user_detail.username }}</h4>
+                        <p class="text-muted">{{ user_detail.email }}</p>
+                        <p>
+                            {% if user_detail.is_active %}
+                            <span class="label label-success">Actif</span>
+                            {% else %}
+                            <span class="label label-danger">Inactif</span>
+                            {% endif %}
+                            {% if user_detail.role == 'admin' %}
+                            <span class="label label-danger">Admin</span>
+                            {% else %}
+                            <span class="label label-primary">User</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div class="box-body">
+                        <table class="table table-bordered">
+                            <tr>
+                                <td><strong>Téléphone</strong></td>
+                                <td>{{ user_detail.phone|default:"-" }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Inscrit le</strong></td>
+                                <td>{{ user_detail.date_joined|date:"d/m/Y" }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Commandes</strong></td>
+                                <td>{{ orders.count }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="box-footer">
+                        <a href="{% url 'dash_admin:user_toggle_status' user_detail.id %}"
+                           class="btn btn-block {% if user_detail.is_active %}btn-warning{% else %}btn-success{% endif %}"
+                           onclick="return confirm('{% if user_detail.is_active %}Désactiver{% else %}Activer{% endif %} cet utilisateur ?')">
+                            <i class="fa fa-{% if user_detail.is_active %}ban{% else %}check{% endif %}"></i>
+                            {% if user_detail.is_active %}Désactiver{% else %}Activer{% endif %}
+                        </a>
+                        <a href="{% url 'dash_admin:user_delete' user_detail.id %}"
+                           class="btn btn-danger btn-block"
+                           onclick="return confirm('Supprimer {{ user_detail.username }} ?')"
+                           style="margin-top:5px;">
+                            <i class="fa fa-trash"></i> Supprimer
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Commandes de l'utilisateur -->
+            <div class="col-md-8">
+                <div class="box box-info">
+                    <div class="box-header with-border">
+                        <h3 class="box-title">
+                            <i class="fa fa-shopping-cart"></i>
+                            Commandes de {{ user_detail.username }} ({{ orders.count }})
+                        </h3>
+                    </div>
+                    <div class="box-body table-responsive no-padding">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Total</th>
+                                    <th>Statut</th>
+                                    <th>Date</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for order in orders %}
+                                <tr>
+                                    <td><small>{{ order.id|truncatechars:8 }}</small></td>
+                                    <td><strong>{{ order.total_price }} FCFA</strong></td>
+                                    <td>
+                                        {% if order.status == 'pending' %}
+                                        <span class="label label-warning">En attente</span>
+                                        {% elif order.status == 'confirmed' %}
+                                        <span class="label label-info">Confirmée</span>
+                                        {% elif order.status == 'shipped' %}
+                                        <span class="label label-primary">Expédiée</span>
+                                        {% elif order.status == 'delivered' %}
+                                        <span class="label label-success">Livrée</span>
+                                        {% elif order.status == 'cancelled' %}
+                                        <span class="label label-danger">Annulée</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ order.created_at|date:"d/m/Y" }}</td>
+                                    <td>
+                                        <a href="{% url 'dash_admin:order_detail' order.id %}"
+                                           class="btn btn-info btn-xs">
+                                            <i class="fa fa-eye"></i> Voir
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center" style="padding:20px;">
+                                        <i class="fa fa-info-circle"></i> Aucune commande
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+</aside>
+{% endblock %}

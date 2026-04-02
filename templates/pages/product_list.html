@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<aside class="right-side">
+    <section class="content-header">
+        <h1>Produits <small>Liste</small></h1>
+        <ol class="breadcrumb">
+            <li><a href="{% url 'dash_admin:dashboard' %}"><i class="fa fa-dashboard"></i> Home</a></li>
+            <li class="active">Produits</li>
+        </ol>
+    </section>
+
+    <section class="content">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="box">
+                    <div class="box-header">
+                        <h3 class="box-title">Liste des produits</h3>
+                        <div class="pull-right">
+                            <a href="{% url 'dash_admin:product_create' %}" class="btn btn-primary btn-sm">
+                                <i class="fa fa-plus"></i> Ajouter
+                            </a>
+                        </div>
+                    </div>
+                    <div class="box-body table-responsive">
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Image</th>
+                                    <th>Titre</th>
+                                    <th>Prix</th>
+                                    <th>Genre</th>
+                                    <th>Stock</th>
+                                    <th>Featured</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for product in products %}
+                                <tr>
+                                    <td>{{ product.id }}</td>
+                                    <td>
+    {% if product.img %}
+        <img src="{{ product.img.url }}" style="width:50px; height:50px; object-fit:cover; border-radius:4px;">
+    {% else %}
+        <span class="text-muted">-</span>
+    {% endif %}
+</td>
+                                    <td>{{ product.title }}</td>
+                                    <td>{{ product.price }} FCFA</td>
+                                    <td>{{ product.genre }}</td>
+                                    <td>{{ product.count_in_stock }}</td>
+                                    <td>
+                                        {% if product.featured %}
+                                            <span class="label label-success">Oui</span>
+                                        {% else %}
+                                            <span class="label label-default">Non</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+    <a href="{% url 'dash_admin:product_update' product.id %}" class="btn btn-info btn-xs">
+        <i class="fa fa-edit"></i> Modifier
+    </a>
+    <a href="{% url 'dash_admin:product_delete' product.id %}" 
+       class="btn btn-danger btn-xs"
+       onclick="return confirm('Supprimer ce produit ?')">
+        <i class="fa fa-trash"></i> Supprimer
+    </a>
+    <a href="{% url 'dash_admin:product_detail' product.id %}"
+   class="btn btn-info btn-xs">
+    <i class="fa fa-eye"></i> Détail
+</a>
+</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="8" class="text-center">Aucun produit trouvé</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</aside>
+{% endblock %}

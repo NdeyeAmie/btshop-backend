@@ -1,0 +1,141 @@
+{% extends 'base.html' %} {% load static %} {% block content %}
+<aside class="right-side">
+  <section class="content-header">
+    <h1>Commande <small>#{{ order.id|truncatechars:8 }}</small></h1>
+    <ol class="breadcrumb">
+      <li>
+        <a href="{% url 'dash_admin:dashboard' %}"
+          ><i class="fa fa-dashboard"></i> Home</a
+        >
+      </li>
+      <li><a href="{% url 'dash_admin:order_list' %}">Commandes</a></li>
+      <li class="active">Détail</li>
+    </ol>
+  </section>
+
+  <section class="content">
+    <div class="row">
+      <!-- Infos commande -->
+      <div class="col-md-8">
+        <div class="box box-primary">
+          <div class="box-header with-border">
+            <h3 class="box-title">
+              <i class="fa fa-list"></i> Produits commandés
+            </h3>
+          </div>
+          <div class="box-body table-responsive">
+            <table class="table table-bordered">
+              <thead>
+                <tr>
+                  <th>Produit</th>
+                  <th>Prix unitaire</th>
+                  <th>Quantité</th>
+                  <th>Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for item in order.items.all %}
+                <tr>
+                  <td>
+                    {% if item.product.img %}
+                    <img
+                      src="{{ item.product.img.url }}"
+                      style="
+                        width: 40px;
+                        height: 40px;
+                        object-fit: cover;
+                        border-radius: 4px;
+                        margin-right: 8px;
+                      "
+                    />
+                    {% endif %} {{ item.product.title }}
+                  </td>
+                  <td>{{ item.price }} FCFA</td>
+                  <td>{{ item.quantity }}</td>
+                  <td><strong>{{ item.get_total }} FCFA</strong></td>
+                </tr>
+                {% endfor %}
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td colspan="3" class="text-right">
+                    <strong>Total :</strong>
+                  </td>
+                  <td>
+                    <strong class="text-green"
+                      >{{ order.total_price }} FCFA</strong
+                    >
+                  </td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Infos client + Statut -->
+      <div class="col-md-4">
+        <!-- Infos client -->
+        <div class="box box-info">
+          <div class="box-header with-border">
+            <h3 class="box-title">
+              <i class="fa fa-user"></i> Informations livraison
+            </h3>
+          </div>
+          <div class="box-body">
+            <p>
+              <strong>Nom complet :</strong> {{ order.full_name|default:"-" }}
+            </p>
+            <p><strong>Email :</strong> {{ order.email|default:"-" }}</p>
+            <p><strong>Téléphone :</strong> {{ order.phone|default:"-" }}</p>
+            <p><strong>Adresse :</strong> {{ order.address|default:"-" }}</p>
+            <p><strong>Ville :</strong> {{ order.city|default:"-" }}</p>
+            <p>
+              <strong>Code postal :</strong> {{ order.postal_code|default:"-" }}
+            </p>
+            <p><strong>Pays :</strong> {{ order.country|default:"-" }}</p>
+            <p>
+              <strong>Date :</strong> {{ order.created_at|date:"d/m/Y H:i" }}
+            </p>
+          </div>
+        </div>
+
+        <!-- Modifier statut -->
+        <!-- Modifier statut -->
+<div class="box box-warning">
+  <div class="box-header with-border">
+    <h3 class="box-title"><i class="fa fa-edit"></i> Statut</h3>
+  </div>
+  <div class="box-body">
+    <form method="POST" action="{% url 'dash_admin:order_update_status' order.id %}">
+      {% csrf_token %}
+      <div class="form-group">
+        <select name="status" class="form-control">
+          <option value="pending" {% if order.status == "pending" %}selected{% endif %}>
+            En attente
+          </option>
+          <option value="confirmed" {% if order.status == "confirmed" %}selected{% endif %}>
+            Confirmée
+          </option>
+          <option value="shipped" {% if order.status == "shipped" %}selected{% endif %}>
+            Expédiée
+          </option>
+          <option value="delivered" {% if order.status == "delivered" %}selected{% endif %}>
+            Livrée
+          </option>
+          <option value="cancelled" {% if order.status == "cancelled" %}selected{% endif %}>
+            Annulée
+          </option>
+        </select>
+      </div>
+      <button type="submit" class="btn btn-warning btn-block">
+        <i class="fa fa-save"></i> Mettre à jour
+      </button>
+    </form>
+  </div>
+</div>
+      </div>
+    </div>
+  </section>
+</aside>
+{% endblock %}

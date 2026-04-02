@@ -1,0 +1,204 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<aside class="right-side">
+    <section class="content-header">
+        <h1>Produit <small>Détail</small></h1>
+        <ol class="breadcrumb">
+            <li><a href="{% url 'dash_admin:dashboard' %}"><i class="fa fa-dashboard"></i> Home</a></li>
+            <li><a href="{% url 'dash_admin:product_list' %}">Produits</a></li>
+            <li class="active">{{ product.title }}</li>
+        </ol>
+    </section>
+
+    <section class="content">
+        <div class="row">
+
+            <!-- Infos produit -->
+            <div class="col-md-8">
+                <div class="box box-primary">
+                    <div class="box-header with-border">
+                        <h3 class="box-title"><i class="fa fa-shopping-bag"></i> {{ product.title }}</h3>
+                        <div class="pull-right">
+                            <a href="{% url 'dash_admin:product_update' product.id %}"
+                               class="btn btn-warning btn-sm">
+                                <i class="fa fa-edit"></i> Modifier
+                            </a>
+                            <a href="{% url 'dash_admin:product_delete' product.id %}"
+                               class="btn btn-danger btn-sm"
+                               onclick="return confirm('Supprimer ce produit ?')">
+                                <i class="fa fa-trash"></i> Supprimer
+                            </a>
+                        </div>
+                    </div>
+                    <div class="box-body">
+                        <div class="row">
+                            <!-- Images -->
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Image principale</label><br>
+                                    {% if product.img %}
+                                    <img src="{{ product.img.url }}"
+                                         style="width:100%; max-height:250px; object-fit:cover; border-radius:8px;">
+                                    {% else %}
+                                    <span class="text-muted">Aucune image</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Image hover</label><br>
+                                    {% if product.hover_img %}
+                                    <img src="{{ product.hover_img.url }}"
+                                         style="width:100%; max-height:250px; object-fit:cover; border-radius:8px;">
+                                    {% else %}
+                                    <span class="text-muted">Aucune image</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Prix :</strong> {{ product.price }} FCFA</p>
+                                <p><strong>Stock :</strong> {{ product.count_in_stock }}</p>
+                                <p><strong>Genre :</strong> {{ product.get_genre_display }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Note :</strong>
+                                    {% for i in "12345" %}
+                                        {% if forloop.counter <= product.rating %}
+                                            <i class="fa fa-star text-yellow"></i>
+                                        {% else %}
+                                            <i class="fa fa-star-o text-muted"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                    ({{ product.num_reviews }} avis)
+                                </p>
+                                <p><strong>Featured :</strong>
+                                    {% if product.featured %}
+                                    <span class="label label-success">Oui</span>
+                                    {% else %}
+                                    <span class="label label-default">Non</span>
+                                    {% endif %}
+                                </p>
+                                <p><strong>Créé le :</strong> {{ product.created_at|date:"d/m/Y" }}</p>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Description</label>
+                            <p>{{ product.desc|default:"Aucune description" }}</p>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Fragrances</label><br>
+                            {% for fragrance in product.fragrances.all %}
+                            <span class="label label-info" style="margin:3px; font-size:12px; padding:5px 10px;">
+                                <i class="fa fa-leaf"></i> {{ fragrance.name }}
+                            </span>
+                            {% empty %}
+                            <span class="text-muted">Aucune fragrance</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reviews -->
+                <div class="box box-warning">
+                    <div class="box-header with-border">
+                        <h3 class="box-title"><i class="fa fa-comments"></i> Avis clients ({{ reviews.count }})</h3>
+                    </div>
+                    <div class="box-body">
+                        {% for review in reviews %}
+                        <div style="border-bottom:1px solid #f4f4f4; padding:10px 0;">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <strong><i class="fa fa-user"></i> {{ review.user.username }}</strong>
+                                    <span class="pull-right text-muted">
+                                        {{ review.created_at|date:"d/m/Y" }}
+                                    </span>
+                                </div>
+                            </div>
+                            <div>
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= review.rating %}
+                                        <i class="fa fa-star text-yellow"></i>
+                                    {% else %}
+                                        <i class="fa fa-star-o text-muted"></i>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                            <p style="margin-top:5px;">{{ review.comment|default:"Pas de commentaire" }}</p>
+                        </div>
+                        {% empty %}
+                        <p class="text-center text-muted">
+                            <i class="fa fa-info-circle"></i> Aucun avis pour ce produit
+                        </p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar infos -->
+            <div class="col-md-4">
+                <div class="box box-info">
+                    <div class="box-header with-border">
+                        <h3 class="box-title"><i class="fa fa-info-circle"></i> Résumé</h3>
+                    </div>
+                    <div class="box-body">
+                        <table class="table table-bordered">
+                            <tr>
+                                <td><strong>ID</strong></td>
+                                <td><small>{{ product.id }}</small></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Prix</strong></td>
+                                <td>{{ product.price }} FCFA</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Stock</strong></td>
+                                <td>
+                                    {% if product.count_in_stock > 0 %}
+                                    <span class="text-green">{{ product.count_in_stock }} disponibles</span>
+                                    {% else %}
+                                    <span class="text-red">Rupture de stock</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Note</strong></td>
+                                <td>{{ product.rating }}/5 ({{ product.num_reviews }} avis)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Genre</strong></td>
+                                <td>{{ product.get_genre_display }}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Featured</strong></td>
+                                <td>
+                                    {% if product.featured %}
+                                    <span class="label label-success">Oui</span>
+                                    {% else %}
+                                    <span class="label label-default">Non</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="box-footer">
+                        <a href="{% url 'dash_admin:product_update' product.id %}"
+                           class="btn btn-warning btn-block">
+                            <i class="fa fa-edit"></i> Modifier ce produit
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+</aside>
+{% endblock %}
